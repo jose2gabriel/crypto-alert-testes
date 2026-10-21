@@ -1,56 +1,54 @@
-# Welcome to your Expo app 👋
+# Crypto Alert — Testes Automatizados
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Suíte de testes automatizados para o projeto [React Native Crypto Alert](https://github.com/rocketseat-education/react-native-crypto-alert), usando **Jest** (`jest-expo`) e **React Native Testing Library**.
 
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Instalação
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Para rodar o app (opcional), copie `.env.example` para `.env` e coloque sua chave da API da [CoinGecko](https://www.coingecko.com/) em `EXPO_PUBLIC_COINGECKO_API_KEY`. Os testes **não** precisam da chave, porque não fazem chamadas reais à API.
 
-### Other setup steps
+## Executar os testes
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```bash
+npm test
+```
 
-## Learn more
+## Gerar a cobertura
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npm run test:coverage
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+O relatório HTML é gerado em `coverage/index.html`.
 
-## Join the community
+## Testes criados
 
-Join our community of developers creating universal apps.
+São 8 testes, dois em cada categoria:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+| Categoria | Arquivo | O que é validado |
+|---|---|---|
+| Funções puras | `src/utils/__tests__/format.test.ts` | `formatPrice` (milhar, casas decimais, zero, `NaN`) e `formatChange` (sinal `+` em positivos e zero, `-` em negativos). |
+| Componentes | `src/components/__tests__/components.test.tsx` | `AlertCard` exibe nome, condição e preço, e chama `onDelete` com o id. `PrimaryButton` exibe o rótulo, fica desabilitado sem disparar `onPress` e dispara quando está habilitado. |
+| Hook | `src/screens/CryptoListScreen/__tests__/useCryptoListScreen.test.ts` | Estado inicial `loading`, depois `idle` com os dados da API mapeados (símbolo em maiúsculas, variação nula vira `0`). Erro da API leva ao estado `error`, e `handleRetry` recupera. |
+| Fluxos completos | `src/__tests__/flows.test.tsx` | **Criar alerta:** escolhe a moeda, digita o preço, marca "Below", salva, vê o alerta na lista, confirma que foi persistido e exclui. **Listagem:** moedas vindas da API com preço e variação, e o badge "1 alert" de um alerta salvo, que ao ser tocado mostra os detalhes. |
+
+### Mocks (apenas limites externos)
+
+- `fetch` (API CoinGecko): `jest.spyOn(global, "fetch")` em cada teste.
+- `AsyncStorage`: mock oficial da biblioteca, em memória (`jest.setup.js`).
+- `expo-router`: `router.push/replace/back` viram `jest.fn()` (`jest.setup.js`).
+
+Componentes, hooks, `AlertProvider` e regras de validação continuam reais.
+
+## Cobertura
+
+| Statements | Branches | Functions | Lines |
+|---|---|---|---|
+| 74.66% | 62.42% | 76.66% | 76.35% |
+
+![Relatório de cobertura](docs/coverage.png)
+
+O relatório completo em texto está em [`docs/coverage-report.txt`](docs/coverage-report.txt).
