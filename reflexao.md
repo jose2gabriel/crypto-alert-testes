@@ -55,3 +55,5 @@ O Maestro usa arquivos YAML simples (`launchApp`, `tapOn`, `inputText`, `assertV
 5. Repetir até o fluxo passar, de forma estável, contra o app instalado.
 
 Assim, o Maestro funciona como o "juiz": um fluxo sugerido pela IA só é aceito depois de rodar de verdade no aplicativo.
+
+Na prática isso aconteceu neste projeto. Mesmo depois de revisar o rascunho da IA olhando o código, três dos quatro fluxos falharam na primeira execução no emulador. O Maestro mostrou o passo exato e a captura da tela no momento da falha, e assim deu para descobrir problemas que nem a IA nem a leitura do código revelavam: o rótulo das abas começa com o caractere invisível do ícone, o `hideKeyboard` funciona como "Voltar" no Android e fechava a tela, e o texto da condição do alerta aparece como uma frase só. Os detalhes estão em [`ia/planejamento.md`](ia/planejamento.md).
