@@ -4,17 +4,20 @@ name: Excluir alerta
 ---
 - launchApp:
     clearState: true
-- tapOn: "Alerts"
+# Botão da aba: o rótulo de acessibilidade começa com o glifo do ícone (caractere invisível) seguido de ", Nome", por isso usamos regex.
+- tapOn: ".*, Alerts"
 - tapOn: "Create Alert"
 - tapOn: "Select cryptocurrency"
 - tapOn: "Ethereum"
 - tapOn: "0.00"
 - inputText: "3000"
-- hideKeyboard
+# Fecha o teclado confirmando o campo (no Android, hideKeyboard age como "Voltar" e sai da tela).
+- pressKey: Enter
 - tapOn: "Below target price"
 - tapOn: "Save Alert"
 - assertVisible: "Ethereum"
-- assertVisible: "below"
+# No Android o Text aninhado vira uma linha só com a frase completa.
+- assertVisible: "Alert when price goes below"
 - assertVisible: "\\$3,000\\.00"
 - tapOn: "Delete alert"
 - assertNotVisible: "Ethereum"

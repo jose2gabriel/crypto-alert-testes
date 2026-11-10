@@ -4,7 +4,8 @@ name: Criar alerta de preço
 ---
 - launchApp:
     clearState: true
-- tapOn: "Alerts"
+# Botão da aba: o rótulo de acessibilidade começa com o glifo do ícone (caractere invisível) seguido de ", Nome", por isso usamos regex.
+- tapOn: ".*, Alerts"
 - assertVisible: "Price Alerts"
 - assertVisible: "No alerts yet"
 - tapOn: "New Alert"
@@ -18,17 +19,20 @@ name: Criar alerta de preço
 - assertVisible: "Bitcoin \\(BTC\\)"
 - tapOn: "0.00"
 - inputText: "70000"
-- hideKeyboard
+# Fecha o teclado confirmando o campo (no Android, hideKeyboard age como "Voltar" e sai da tela).
+- pressKey: Enter
 - tapOn: "Above target price"
 - tapOn: "Save Alert"
 # Volta para a lista de alertas com o novo alerta.
 - assertVisible: "Price Alerts"
 - assertVisible: "Bitcoin"
-- assertVisible: "above"
+# No Android o Text aninhado vira uma linha só com a frase completa.
+- assertVisible: "Alert when price goes above"
 - assertVisible: "\\$70,000\\.00"
 - takeScreenshot: screenshots/03_alerta_criado
 # A aba de lista mostra o indicador de alerta no card do Bitcoin.
-- tapOn: "List"
+# Botão da aba: o rótulo de acessibilidade começa com o glifo do ícone (caractere invisível) seguido de ", Nome", por isso usamos regex.
+- tapOn: ".*, List"
 - extendedWaitUntil:
     visible: "1 alert"
     timeout: 20000
