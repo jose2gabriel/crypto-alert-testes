@@ -95,3 +95,47 @@ IA utilizada: **Claude (Anthropic)**, em conversa de chat. O prompt descreve o a
 > ```
 >
 > **Dicas:** use `clearState: true` no `launchApp` para começar sempre do zero, e adicione `testID` nos componentes para ter seletores mais estáveis. Ajuste os textos conforme a interface real do app.
+
+## 3. Cenários selecionados
+
+Depois de comparar a resposta com o app rodando no emulador, foram escolhidos quatro cenários, um para cada fluxo principal do app:
+
+| # | Cenário | Origem na resposta da IA | Arquivo |
+|---|---|---|---|
+| 1 | Abrir o app e ver a lista de moedas com nome, símbolo, preço e variação de 24h | Cenários 1 e 2 | `.maestro/01_listar_criptomoedas.yaml` |
+| 2 | Converter uma quantidade de BTC para USD, validar valor inválido e trocar para BRL | Cenários 6, 7 e 8 | `.maestro/02_converter_moeda.yaml` |
+| 3 | Criar um alerta "acima de" para o Bitcoin e ver o indicador na aba Lista | Cenários 9, 10 e 15 | `.maestro/03_criar_alerta.yaml` |
+| 4 | Criar e excluir um alerta, voltando ao estado vazio | Cenário 11 | `.maestro/04_excluir_alerta.yaml` |
+
+## 4. Análise crítica
+
+### O que foi aproveitado
+
+- A divisão dos cenários pelas três abas (Lista, Converter, Alertas) e a ideia geral de cada fluxo.
+- A dica de usar `launchApp` com `clearState: true`, para cada teste começar sem alertas salvos e não depender da ordem de execução.
+- O cenário 15 (indicador de alertas na aba Lista), que testa a integração entre duas telas.
+- A estrutura básica dos YAMLs (`launchApp`, `tapOn`, `inputText`, `assertVisible`).
+
+### O que foi corrigido
+
+- **`appId` errado:** a IA usou `com.cryptoalert`, mas o pacote real definido no `app.json` é `com.cryptoalert.app`. Com o valor da IA, o Maestro nem abre o app.
+- **Textos em português:** a IA traduziu a interface ("Alertas", "Converter", "Salvar", "Acima", "Nenhum alerta"), mas o app é todo em inglês. Os seletores foram trocados pelos textos reais: `Alerts`, `Convert`, `Save Alert`, `Above target price`, `No alerts yet` etc.
+- **Seletores por `id` inexistentes:** `amount-input` e `target-price-input` não existem no código, porque o app não tem `testID`. Os campos foram selecionados pelo placeholder real (`0.00`) e pelos rótulos de acessibilidade (`Delete alert`, `Toggle alerts for this cryptocurrency`).
+- **Botão "+":** o botão de criar alerta tem o texto `New Alert` (ou `Create Alert` no estado vazio), não só o ícone "+".
+- **Exclusão:** a IA supôs um `longPressOn` com menu "Excluir". No app, o alerta tem um botão de lixeira com rótulo `Delete alert`, e a exclusão é imediata, sem confirmação.
+- **Valores fixos:** a IA verificava `"70000"`, mas o app formata como `$70,000.00`. Para preços da API, que mudam o tempo todo, foram usadas expressões regulares (`\$[0-9,]+\.[0-9]{2}`) em vez de valores exatos.
+- **Carregamento da API:** a IA não esperava a resposta da CoinGecko. Foi adicionado `extendedWaitUntil` com timeout de 20 s para evitar falhas por lentidão da rede.
+- **Validação do formulário:** a IA sugeriu verificar mensagens de erro ao salvar vazio, mas o app não mostra mensagem; ele deixa o botão `Save Alert` desabilitado. O teste verifica `enabled: false`.
+
+### O que foi descartado
+
+- **Cenário 3 (busca por nome):** o app não tem barra de busca.
+- **Cenário 12 (editar alerta):** não existe edição de alertas, só criar e excluir.
+- **Cenário 14 (notificação ao atingir o preço):** o app não dispara notificações, e mesmo que disparasse, depender do preço real do mercado deixaria o teste imprevisível.
+- **Cenário 5 (sem internet):** exigiria desligar a rede do emulador durante o teste, o que é instável no Maestro. O estado de erro já é coberto pelos testes de integração com Jest (`fetch` mockado).
+- **Cenário 4 (pull-to-refresh):** como os preços podem não mudar entre duas chamadas, não há como verificar de forma confiável que houve atualização.
+- **Cenário 13 (persistência após reabrir):** foi considerado, mas ficou de fora dos quatro principais. A persistência no AsyncStorage já é verificada nos testes de integração.
+
+### Conclusão
+
+A IA acelerou o levantamento de ideias, mas nenhum dos quatro rascunhos funcionou sem alteração: todos tinham `appId` e seletores incorretos, porque ela não conhecia a interface real. Dos 15 cenários, 6 foram descartados por descreverem funções que o app não tem ou por serem instáveis. Isso confirma o que o artigo GenIA-E2ETest aponta: a IA gera um bom ponto de partida, mas a revisão humana e a execução no app real são indispensáveis.
