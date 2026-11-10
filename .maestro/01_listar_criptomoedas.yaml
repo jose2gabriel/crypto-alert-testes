@@ -1,0 +1,17 @@
+# Fluxo 1: a lista de criptomoedas carrega dados da API ao abrir o app.
+appId: com.cryptoalert.app
+name: Listar criptomoedas
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Cryptocurrencies"
+# A lista vem da API da CoinGecko; espera o carregamento terminar.
+- extendedWaitUntil:
+    visible: "Bitcoin"
+    timeout: 20000
+- assertVisible: "BTC"
+- assertVisible: "Ethereum"
+# Preço em dólar e variação de 24h (os valores mudam, então validamos o formato).
+- assertVisible: "\\$[0-9,]+\\.[0-9]{2}"
+- assertVisible: "[+-][0-9]+\\.[0-9]{2}%"
+- takeScreenshot: screenshots/01_lista

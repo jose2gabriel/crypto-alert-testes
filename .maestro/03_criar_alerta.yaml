@@ -1,0 +1,37 @@
+# Fluxo 3: criar um alerta de preço e vê-lo na lista de alertas e na lista de moedas.
+appId: com.cryptoalert.app
+name: Criar alerta de preço
+---
+- launchApp:
+    clearState: true
+- tapOn: "Alerts"
+- assertVisible: "Price Alerts"
+- assertVisible: "No alerts yet"
+- tapOn: "New Alert"
+- assertVisible: "Create Alert"
+# Sem preencher o formulário, o botão de salvar fica desabilitado.
+- assertVisible:
+    text: "Save Alert"
+    enabled: false
+- tapOn: "Select cryptocurrency"
+- tapOn: "Bitcoin"
+- assertVisible: "Bitcoin \\(BTC\\)"
+- tapOn: "0.00"
+- inputText: "70000"
+- hideKeyboard
+- tapOn: "Above target price"
+- tapOn: "Save Alert"
+# Volta para a lista de alertas com o novo alerta.
+- assertVisible: "Price Alerts"
+- assertVisible: "Bitcoin"
+- assertVisible: "above"
+- assertVisible: "\\$70,000\\.00"
+- takeScreenshot: screenshots/03_alerta_criado
+# A aba de lista mostra o indicador de alerta no card do Bitcoin.
+- tapOn: "List"
+- extendedWaitUntil:
+    visible: "1 alert"
+    timeout: 20000
+- tapOn: "Toggle alerts for this cryptocurrency"
+- assertVisible: "Above target"
+- takeScreenshot: screenshots/03_indicador_na_lista

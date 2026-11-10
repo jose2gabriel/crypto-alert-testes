@@ -1,0 +1,22 @@
+# Fluxo 4: excluir um alerta e confirmar que a lista volta ao estado vazio.
+appId: com.cryptoalert.app
+name: Excluir alerta
+---
+- launchApp:
+    clearState: true
+- tapOn: "Alerts"
+- tapOn: "Create Alert"
+- tapOn: "Select cryptocurrency"
+- tapOn: "Ethereum"
+- tapOn: "0.00"
+- inputText: "3000"
+- hideKeyboard
+- tapOn: "Below target price"
+- tapOn: "Save Alert"
+- assertVisible: "Ethereum"
+- assertVisible: "below"
+- assertVisible: "\\$3,000\\.00"
+- tapOn: "Delete alert"
+- assertNotVisible: "Ethereum"
+- assertVisible: "No alerts yet"
+- takeScreenshot: screenshots/04_alerta_excluido
