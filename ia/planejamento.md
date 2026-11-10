@@ -126,6 +126,10 @@ Depois de comparar a resposta com o app rodando no emulador, foram escolhidos qu
 - **Valores fixos:** a IA verificava `"70000"`, mas o app formata como `$70,000.00`. Para preços da API, que mudam o tempo todo, foram usadas expressões regulares (`\$[0-9,]+\.[0-9]{2}`) em vez de valores exatos.
 - **Carregamento da API:** a IA não esperava a resposta da CoinGecko. Foi adicionado `extendedWaitUntil` com timeout de 20 s para evitar falhas por lentidão da rede.
 - **Validação do formulário:** a IA sugeriu verificar mensagens de erro ao salvar vazio, mas o app não mostra mensagem; ele deixa o botão `Save Alert` desabilitado. O teste verifica `enabled: false`.
+- **Ajustes descobertos só ao executar no emulador:** mesmo depois da primeira revisão, três fluxos falharam na execução real e precisaram de mais correções:
+  - As abas não têm texto próprio. O rótulo de acessibilidade começa com o glifo invisível do ícone (Ionicons) seguido de `, Convert`, então `tapOn: "Convert"` não encontrava nada. Foi usada a regex `".*, Convert"`.
+  - O `hideKeyboard` sugerido pela IA, no Android, funciona como o botão "Voltar" e fechava a tela de conversão e a de criar alerta. Foi trocado por `pressKey: Enter`.
+  - A condição do alerta é um `<Text>` aninhado e aparece para o Maestro como uma frase só, `Alert when price goes above`, e não como a palavra `above` sozinha.
 
 ### O que foi descartado
 
